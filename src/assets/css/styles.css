@@ -1,0 +1,208 @@
+/* Sistema de cores global para o aplicativo de finanças */
+:root {
+    /* Cores principais */
+    --cor-primaria: #2c3e50;        /* Azul escuro para elementos principais */
+    --cor-secundaria: #16a085;      /* Verde-azulado para elementos de apoio */
+    --cor-terciaria: #3498db;       /* Azul para links e botões secundários */
+    
+    /* Cores para finanças */
+    --cor-receita: #27ae60;         /* Verde para valores positivos/receitas */
+    --cor-receita-clara: #2ecc71;   /* Verde mais claro para hover/destaque */
+    --cor-despesa: #c0392b;         /* Vermelho para valores negativos/despesas */
+    --cor-despesa-clara: #e74c3c;   /* Vermelho mais claro para hover/destaque */
+    --cor-economia: #f39c12;        /* Amarelo/laranja para economias/metas */
+    --cor-investimento: #8e44ad;    /* Roxo para investimentos */
+    
+    /* Estados */
+    --cor-sucesso: #27ae60;         /* Verde para confirmações/sucesso */
+    --cor-erro: #e74c3c;            /* Vermelho para erros */
+    --cor-alerta: #f39c12;          /* Amarelo para avisos */
+    --cor-info: #3498db;            /* Azul para informações */
+    
+    /* Tons neutros */
+    --cor-texto: #2c3e50;           /* Cor principal para textos */
+    --cor-texto-secundario: #7f8c8d; /* Cor para textos secundários */
+    --cor-borda: #bdc3c7;           /* Cor para bordas */
+    --cor-fundo: #ecf0f1;           /* Cor de fundo clara */
+    --cor-fundo-escura: #95a5a6;    /* Cor de fundo mais escura */
+    --cor-fundo-card: #ffffff;      /* Branco para cards */
+    
+    /* Cores de destaque */
+    --cor-destaque: #e67e22;        /* Laranja para elementos de destaque */
+}
+
+#sidebar {
+    height: 100vh;
+    padding: 20px;
+    margin: 0px;
+    background-color: var(--cor-primaria);
+    color: white;
+}
+
+.title {
+    color: var(--cor-secundaria);
+}
+
+.row {
+    --bs-gutter-x: 0rem !important;
+}
+
+.card {
+    margin-right: 10px;
+    background-color: var(--cor-fundo-card);
+    border: 1px solid var(--cor-borda);
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+}
+
+/* Centralizando o botão de perfil */
+.btn-perfil {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    background-color: var(--cor-secundaria);
+    border-radius: 100%;
+    border: 0px transparent;
+    width: 150px;
+    height: 150px;
+    margin-bottom: 20px;
+}
+
+.btn-perfil:hover {
+    background-color: #1abc9c; /* Versão mais clara da cor secundária */
+    transition: background-color 0.3s ease;
+    cursor: pointer;
+}
+
+.perfil_avatar {
+    width: 100px !important;
+    height: auto;
+    margin-left: auto;
+    margin-right: auto;
+    background-color: rgba(0, 0, 0, 0) !important;
+}
+
+/* Estilo para a linha de botões */
+.buttons-row {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    margin: 20px 0;
+}
+
+/* Estilo para os botões de receita e despesa */
+.action-button {
+    width: 100%;
+    margin: 0 5px;
+    padding: 10px;
+    font-weight: bold;
+    border-radius: 6px;
+    transition: all 0.3s ease;
+}
+
+/* Classes utilitárias de cores para uso geral */
+.text-income { color: var(--cor-receita) !important; }
+.text-expense { color: var(--cor-despesa) !important; }
+.text-investment { color: var(--cor-investimento) !important; }
+.text-economy { color: var(--cor-economia) !important; }
+
+.bg-income { background-color: var(--cor-receita) !important; }
+.bg-expense { background-color: var(--cor-despesa) !important; }
+.bg-investment { background-color: var(--cor-investimento) !important; }
+.bg-economy { background-color: var(--cor-economia) !important; }
+
+/* Botões temáticos */
+.btn-income {
+    background-color: var(--cor-receita);
+    color: white;
+    border-color: var(--cor-receita);
+}
+.btn-income:hover { 
+    background-color: var(--cor-receita-clara);
+    transform: translateY(-2px);
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+}
+
+.btn-expense {
+    background-color: var(--cor-despesa);
+    color: white;
+    border-color: var(--cor-despesa);
+}
+.btn-expense:hover { 
+    background-color: var(--cor-despesa-clara);
+    transform: translateY(-2px);
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+}
+
+/* Bordas coloridas */
+.border-income { border-color: var(--cor-receita) !important; }
+.border-expense { border-color: var(--cor-despesa) !important; }
+.border-investment { border-color: var(--cor-investimento) !important; }
+.border-economy { border-color: var(--cor-economia) !important; }
+
+/* Navegação lateral */
+.sidebar-nav {
+    display: flex;
+    flex-direction: column;
+    justify-content: flex-start;
+    align-items: stretch;
+    margin-top: 20px;
+    width: 100%;
+}
+
+/* Estilo dos links de navegação */
+.btn-NavLink {
+    color: white !important;
+    font-weight: bold;
+    font-size: 1.2rem;
+    text-align: center;
+    padding: 12px 15px;
+    border-radius: 8px;
+    transition: all 0.3s ease;
+    margin-bottom: 10px;
+    background-color: rgba(255, 255, 255, 0.1);
+    position: relative;
+    overflow: hidden;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+/* Efeito hover nos links */
+.btn-NavLink:hover {
+    background-color: rgba(255, 255, 255, 0.2);
+    color: white !important;
+    transform: translateY(-2px);
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
+}
+
+/* Link ativo/selecionado */
+.btn-NavLink.active {
+    background-color: var(--cor-secundaria) !important;
+    color: white !important;
+    font-weight: bold;
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.3);
+}
+
+/* Garantindo que quando ativo e com hover, mantenha o visual correto */
+.btn-NavLink.active:hover {
+    background-color: var(--cor-secundaria) !important;
+    transform: translateY(-2px);
+}
+
+/* Corrigindo o comportamento de links no Dash */
+.nav-pills .nav-link.active {
+    background-color: var(--cor-secundaria) !important;
+    color: white !important;
+}
+
+.nav-pills .nav-link:not(.active) {
+    background-color: rgba(255, 255, 255, 0.1);
+    color: white !important;
+}
+
+.nav-pills .nav-link:hover:not(.active) {
+    background-color: rgba(255, 255, 255, 0.2);
+    color: white !important;
+}
+
+
