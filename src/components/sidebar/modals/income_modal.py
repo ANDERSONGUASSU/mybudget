@@ -1,37 +1,36 @@
 """
-    Componente de modal para adição de despesas.
+    Componente de modal para adição de receitas.
 """
 
 from datetime import datetime
 from dash import dcc, html
 import dash_bootstrap_components as dbc
 
-from src.components.sidebar.category_modal import get_add_category_modal
-from src.components.sidebar.account_modal import get_add_account_modal
-
-# Modal de adição de despesa
-def get_expense_modal():
+from src.components.sidebar.modals.category_modal import get_add_category_modal
+from src.components.sidebar.modals.account_modal import get_add_account_modal
+# Modal de adição de receita
+def get_income_modal():
     """
-    Retorna o modal de adição de despesa.
+    Retorna o modal de adição de receita.
     """
     return dbc.Modal([
-        dbc.ModalHeader("Adicionar Despesa"),
+        dbc.ModalHeader("Adicionar Receita"),
         dbc.ModalBody([
             dbc.Row([
                 dbc.Col([
                     dbc.Label("Descrição"),
-                    dbc.Input(id="expense_name", placeholder="Nome da despesa"),
+                    dbc.Input(id="income_name", placeholder="Nome da receita"),
                 ], width=6, className="mb-3 p-2"),
                 dbc.Col([
                     dbc.Label("Valor"),
-                    dbc.Input(id="expense_value", placeholder="R$ 0,00"),
+                    dbc.Input(id="income_value", placeholder="R$ 0,00"),
                 ], width=6, className="mb-3 p-2"),
             ]),
             dbc.Row([
                 dbc.Col([
                     dbc.Label("Data"),
                     dcc.DatePickerSingle(
-                        id="expense_date",
+                        id="income_date",
                         min_date_allowed=datetime(2020, 1, 1),
                         max_date_allowed=datetime(2030, 12, 31),
                         date=datetime.today(),
@@ -42,13 +41,11 @@ def get_expense_modal():
                 dbc.Col([
                     dbc.Label("Categoria"),
                     dbc.Select(
-                        id="expense_category",
+                        id="income_category",
                         options=[
-                            {"label": "Alimentação", "value": "alimentacao"},
-                            {"label": "Transporte", "value": "transporte"},
-                            {"label": "Saúde", "value": "saude"},
-                            {"label": "Educação", "value": "educacao"},
-                            {"label": "Lazer", "value": "lazer"},
+                            {"label": "Salário", "value": "salario"},
+                            {"label": "Investimentos", "value": "investimentos"},
+                            {"label": "Freelance", "value": "freelance"},
                             {"label": "Outros", "value": "outros"}
                         ],
                         placeholder="Selecione uma categoria"
@@ -57,7 +54,7 @@ def get_expense_modal():
                 dbc.Col([
                     dbc.Label("Conta"),
                     dbc.Select(
-                        id="expense_account",
+                        id="income_account",
                         options=[
                             {"label": "Conta Corrente", "value": "conta_corrente"},
                             {"label": "Poupança", "value": "poupanca"},
@@ -71,27 +68,46 @@ def get_expense_modal():
             ], style={'margin-top': '25px'}),
             dbc.Row([
                 dbc.Col([
+                    dbc.Label("Recorrência"),
+                    dbc.Select(
+                        id="income_recurrence",
+                        options=[
+                            {"label": "Única", "value": "unica"},
+                            {"label": "Diária", "value": "diaria"},
+                            {"label": "Semanal", "value": "semanal"},
+                            {"label": "Quinzenal", "value": "quinzenal"},
+                            {"label": "Mensal", "value": "mensal"},
+                            {"label": "Bimestral", "value": "bimestral"},
+                            {"label": "Trimestral", "value": "trimestral"},
+                            {"label": "Semestral", "value": "semestral"},
+                            {"label": "Anual", "value": "anual"}
+                        ],
+                        value="unica",
+                        placeholder="Selecione a recorrência"
+                    )
+                ], width=6, className="mb-3 p-2"),
+                dbc.Col([
                     dbc.Label("Extras"),
                     dbc.Checklist(
-                        id="expense_extras",
+                        id="income_extras",
                         options=[],
                         value=[],
                         switch=True
                     )
-                ], width=12, className="mb-3 p-2"),
+                ], width=6, className="mb-3 p-2"),
             ]),
-            get_add_category_modal("expense"),
-            get_add_account_modal("expense"),
+            get_add_category_modal("income"),
+            get_add_account_modal("income"),
         ]),
-        html.Div(id="id_test_expense", className="mt-3", style={},),
+        html.Div(id="id_test_income", className="mt-3", style={},),
         dbc.ModalFooter([
-            dbc.Button("Salvar", color="primary", id="save_expense_button"),
-            dbc.Popover(dbc.PopoverBody("Despesa adicionada com sucesso!"),
-                        target="save_expense_button",
+            dbc.Button("Salvar", color="primary", id="save_income_button"),
+            dbc.Popover(dbc.PopoverBody("Receita adicionada com sucesso!"),
+                        target="save_income_button",
                         trigger="click"),
-            dbc.Button("Cancelar", color="secondary", id="cancel_expense_button"),
+            dbc.Button("Cancelar", color="secondary", id="cancel_income_button"),
         ]),
-    ], id="modal-expense",
+    ], id="modal-income",
         size="xl",
         is_open=False,
         centered=True,

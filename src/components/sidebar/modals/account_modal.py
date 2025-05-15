@@ -21,10 +21,6 @@ def get_add_account_modal(text):
                             id=f"account_name_{text}",
                             placeholder="Nome da conta",
                             className="mb-3"),
-                        dbc.Input(
-                            id=f"account_color_{text}",
-                            type="color", value="#000000",
-                            className="mb-3"),
                         dbc.Button(
                             "Adicionar",
                             id=f"add_account_button_{text}",
