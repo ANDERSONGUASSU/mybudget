@@ -5,3 +5,5 @@
 """
 
 from callbacks.modals_callbacks import *
+from callbacks.category_callbacks import *
+from callbacks.category_select_callbacks import *

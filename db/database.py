@@ -49,17 +49,17 @@ def init_db():
         if session.query(Category).count() == 0:
             # Adiciona categorias padrão
             categories = [
-                Category(name="Salário", type="receita", color="#4CAF50"),
-                Category(name="Freelance", type="receita", color="#8BC34A"),
-                Category(name="Investimentos", type="receita", color="#009688"),
-                Category(name="Alimentação", type="despesa", color="#F44336"),
-                Category(name="Transporte", type="despesa", color="#FF9800"),
-                Category(name="Moradia", type="despesa", color="#795548"),
-                Category(name="Lazer", type="despesa", color="#9C27B0"),
-                Category(name="Saúde", type="despesa", color="#E91E63"),
-                Category(name="Educação", type="despesa", color="#3F51B5"),
-                Category(name="Compras", type="despesa", color="#2196F3"),
-                Category(name="Serviços", type="despesa", color="#00BCD4"),
+                Category(name="Salário", type="income", color="#4CAF50"),
+                Category(name="Freelance", type="income", color="#8BC34A"),
+                Category(name="Investimentos", type="income", color="#009688"),
+                Category(name="Alimentação", type="expense", color="#F44336"),
+                Category(name="Transporte", type="expense", color="#FF9800"),
+                Category(name="Moradia", type="expense", color="#795548"),
+                Category(name="Lazer", type="expense", color="#9C27B0"),
+                Category(name="Saúde", type="expense", color="#E91E63"),
+                Category(name="Educação", type="expense", color="#3F51B5"),
+                Category(name="Compras", type="expense", color="#2196F3"),
+                Category(name="Serviços", type="expense", color="#00BCD4"),
             ]
             session.add_all(categories)
 
