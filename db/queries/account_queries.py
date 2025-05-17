@@ -1,153 +1,99 @@
 """
-    Queries para operações com tabela de contas
+    Consultas relacionadas a contas bancárias
 """
 
 from db.database import get_db_session, close_db_session
-from sqlalchemy import text
+from db.models import Account
+from sqlalchemy import func
 
-def get_all_accounts(active_only=True):
-    """
-    Obtém todas as contas
 
-    Args:
-        active_only (bool, optional): Filtrar apenas contas ativas
-
-    Returns:
-        list: Lista de dicionários com as contas
-    """
-    session = get_db_session()
-    try:
-        base_query = """
-            SELECT id, name, type, balance, color, active
-            FROM accounts
-        """
-
-        params = {}
-
-        if active_only:
-            base_query += " WHERE active = :active"
-            params["active"] = True
-
-        base_query += " ORDER BY name"
-
-        query = text(base_query)
-        results = session.execute(query, params).fetchall()
-
-        # Converter para lista de dicionários
-        return [dict(row) for row in results]
-    finally:
-        close_db_session(session)
-
-def get_dropdown_accounts(active_only=True):
-    """
-    Obtém contas formatadas para componentes dropdown
-
-    Args:
-        active_only (bool, optional): Filtrar apenas contas ativas
-
-    Returns:
-        list: Lista de dicionários formatados para dropdowns
-    """
-    session = get_db_session()
-    try:
-        base_query = """
-            SELECT id, name, type, balance, color, active
-            FROM accounts
-        """
-
-        params = {}
-
-        if active_only:
-            base_query += " WHERE active = :active"
-            params["active"] = True
-
-        base_query += " ORDER BY name"
-
-        query = text(base_query)
-        results = session.execute(query, params).fetchall()
-
-        # Converter para lista de dicionários formatados para componentes dropdown
-        dropdown_options = [
-            {
-                "id": row["id"],
-                "label": f"{row['name']} (R$ {row['balance']:.2f})",
-                "value": row["id"],
-                "color": row["color"]
-            }
-            for row in results
-        ]
-
-        return dropdown_options
-    finally:
-        close_db_session(session)
-
-def get_account_by_id(account_id):
+def get_account_by_id(account_id, session=None):
     """
     Obtém uma conta pelo ID
 
     Args:
         account_id (int): ID da conta
+        session: Sessão SQLAlchemy opcional
 
     Returns:
-        dict: Dados da conta ou None se não encontrada
+        Account: Objeto da conta ou None se não encontrado
     """
-    session = get_db_session()
+    close_session = False
+    if not session:
+        session = get_db_session()
+        close_session = True
+
     try:
-        query = text("""
-            SELECT id, name, type, balance, color, active
-            FROM accounts
-            WHERE id = :account_id
-        """)
-
-        result = session.execute(query, {"account_id": account_id}).fetchone()
-
-        if result:
-            # Converter para dicionário
-            return dict(result)
-        return None
+        return session.query(Account).filter_by(id=account_id).first()
     finally:
-        close_db_session(session)
+        if close_session:
+            close_db_session(session)
 
-def get_account_usage_count(account_id):
+
+def get_all_accounts(session=None):
     """
-    Obtém o número de vezes que uma conta foi usada em transações
+    Obtém todas as contas bancárias
+
+    Args:
+        session: Sessão SQLAlchemy opcional
+
+    Returns:
+        list: Lista de objetos Account
+    """
+    close_session = False
+    if not session:
+        session = get_db_session()
+        close_session = True
+
+    try:
+        return session.query(Account).order_by(Account.name).all()
+    finally:
+        if close_session:
+            close_db_session(session)
+
+
+def get_account_balance(account_id, session=None):
+    """
+    Obtém o saldo atual de uma conta
 
     Args:
         account_id (int): ID da conta
+        session: Sessão SQLAlchemy opcional
 
     Returns:
-        int: Número de usos da conta
+        float: Saldo da conta
     """
-    session = get_db_session()
+    close_session = False
+    if not session:
+        session = get_db_session()
+        close_session = True
+
     try:
-        query = text("""
-            SELECT
-                (SELECT COUNT(*) FROM incomes WHERE account_id = :account_id) +
-                (SELECT COUNT(*) FROM expenses WHERE account_id = :account_id)
-                AS usage_count
-        """)
-
-        result = session.execute(query, {"account_id": account_id}).scalar()
-        return int(result) if result is not None else 0
+        account = session.query(Account).filter_by(id=account_id).first()
+        return account.balance if account else 0.0
     finally:
-        close_db_session(session)
+        if close_session:
+            close_db_session(session)
 
-def get_total_balance():
+
+def get_total_balance(session=None):
     """
-    Obtém o saldo total de todas as contas ativas
+    Obtém o saldo total de todas as contas
+
+    Args:
+        session: Sessão SQLAlchemy opcional
 
     Returns:
-        float: Soma dos saldos de todas as contas ativas
+        float: Saldo total de todas as contas
     """
-    session = get_db_session()
-    try:
-        query = text("""
-            SELECT COALESCE(SUM(balance), 0) as total_balance
-            FROM accounts
-            WHERE active = :active
-        """)
+    close_session = False
+    if not session:
+        session = get_db_session()
+        close_session = True
 
-        result = session.execute(query, {"active": True}).scalar()
-        return float(result) if result is not None else 0.0
+    try:
+        result = session.query(func.sum(Account.balance)).scalar()
+        return float(result) if result else 0.0
     finally:
-        close_db_session(session)
+        if close_session:
+            close_db_session(session)

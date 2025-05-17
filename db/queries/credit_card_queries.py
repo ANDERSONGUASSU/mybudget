@@ -1,203 +1,192 @@
 """
-    Queries para operações com tabela de transações de cartão de crédito
+    Consultas relacionadas a cartões de crédito e suas transações
 """
 
 from db.database import get_db_session, close_db_session
-from sqlalchemy import text
-from datetime import datetime
+from db.models import CreditCard, CreditCardTransaction
+from sqlalchemy import func
+import datetime
 
-def get_credit_card_transaction_by_id(transaction_id):
+
+def get_credit_card_by_id(card_id, session=None):
+    """
+    Obtém um cartão de crédito pelo ID
+
+    Args:
+        card_id (int): ID do cartão
+        session: Sessão SQLAlchemy opcional
+
+    Returns:
+        CreditCard: Objeto do cartão ou None se não encontrado
+    """
+    close_session = False
+    if not session:
+        session = get_db_session()
+        close_session = True
+
+    try:
+        return session.query(CreditCard).filter_by(id=card_id).first()
+    finally:
+        if close_session:
+            close_db_session(session)
+
+
+def get_all_credit_cards(session=None):
+    """
+    Obtém todos os cartões de crédito
+
+    Args:
+        session: Sessão SQLAlchemy opcional
+
+    Returns:
+        list: Lista de objetos CreditCard
+    """
+    close_session = False
+    if not session:
+        session = get_db_session()
+        close_session = True
+
+    try:
+        return session.query(CreditCard).order_by(CreditCard.name).all()
+    finally:
+        if close_session:
+            close_db_session(session)
+
+
+def get_credit_card_transaction_by_id(transaction_id, session=None):
     """
     Obtém uma transação de cartão de crédito pelo ID
 
     Args:
         transaction_id (int): ID da transação
+        session: Sessão SQLAlchemy opcional
 
     Returns:
-        dict: Dados da transação ou None se não encontrada
+        CreditCardTransaction: Objeto da transação ou None se não encontrado
     """
-    session = get_db_session()
+    close_session = False
+    if not session:
+        session = get_db_session()
+        close_session = True
+
     try:
-        query = text("""
-            SELECT t.*, 
-                   c.name as category_name, c.color as category_color,
-                   cc.name as credit_card_name
-            FROM credit_card_transactions t
-            LEFT JOIN categories c ON t.category_id = c.id
-            LEFT JOIN credit_cards cc ON t.credit_card_id = cc.id
-            WHERE t.id = :transaction_id
-        """)
-
-        result = session.execute(query, {"transaction_id": transaction_id}).fetchone()
-
-        if result:
-            # Converter para dicionário
-            return dict(result)
-        return None
+        return session.query(CreditCardTransaction).filter_by(id=transaction_id).first()
     finally:
-        close_db_session(session)
+        if close_session:
+            close_db_session(session)
 
-def get_credit_card_transactions_by_period(start_date, end_date, credit_card_id=None):
+
+def get_credit_card_statement(card_id, year, month, session=None):
     """
-    Obtém todas as transações de cartão de crédito em um determinado período
+    Obtém a fatura do cartão de crédito para um mês específico
 
     Args:
-        start_date (str ou datetime): Data inicial
-        end_date (str ou datetime): Data final
-        credit_card_id (int, optional): ID do cartão para filtrar
-
-    Returns:
-        list: Lista de dicionários com as transações
-    """
-    session = get_db_session()
-    try:
-        # Converter datas se necessário
-        if isinstance(start_date, str):
-            start_date = datetime.strptime(start_date, "%Y-%m-%d").date()
-        elif isinstance(start_date, datetime):
-            start_date = start_date.date()
-
-        if isinstance(end_date, str):
-            end_date = datetime.strptime(end_date, "%Y-%m-%d").date()
-        elif isinstance(end_date, datetime):
-            end_date = end_date.date()
-
-        params = {
-            "start_date": start_date,
-            "end_date": end_date
-        }
-
-        base_query = """
-            SELECT t.*, 
-                   c.name as category_name, c.color as category_color,
-                   cc.name as credit_card_name
-            FROM credit_card_transactions t
-            LEFT JOIN categories c ON t.category_id = c.id
-            LEFT JOIN credit_cards cc ON t.credit_card_id = cc.id
-            WHERE t.date BETWEEN :start_date AND :end_date
-        """
-
-        if credit_card_id:
-            base_query += " AND t.credit_card_id = :credit_card_id"
-            params["credit_card_id"] = credit_card_id
-
-        base_query += " ORDER BY t.date DESC"
-
-        query = text(base_query)
-        results = session.execute(query, params).fetchall()
-
-        # Converter para lista de dicionários
-        return [dict(row) for row in results]
-    finally:
-        close_db_session(session)
-
-def get_monthly_credit_card_sum(year, month, credit_card_id=None):
-    """
-    Obtém a soma total de transações de cartão de crédito de um mês específico
-
-    Args:
+        card_id (int): ID do cartão
         year (int): Ano
         month (int): Mês (1-12)
-        credit_card_id (int, optional): ID do cartão para filtrar
+        session: Sessão SQLAlchemy opcional
 
     Returns:
-        float: Soma das transações no mês
+        dict: Dicionário com transações e total da fatura
     """
-    session = get_db_session()
+    close_session = False
+    if not session:
+        session = get_db_session()
+        close_session = True
+
     try:
-        params = {"year": year, "month": month}
+        # Formatar mês de referência no formato YYYY-MM
+        statement_month = f"{year:04d}-{month:02d}"
 
-        base_query = """
-            SELECT COALESCE(SUM(amount), 0) as total
-            FROM credit_card_transactions
-            WHERE EXTRACT(YEAR FROM date) = :year
-            AND EXTRACT(MONTH FROM date) = :month
-        """
+        # Buscar transações do cartão para o mês de referência
+        transactions = session.query(CreditCardTransaction).filter(
+            CreditCardTransaction.credit_card_id == card_id,
+            CreditCardTransaction.statement_month == statement_month
+        ).order_by(CreditCardTransaction.purchase_date).all()
 
-        if credit_card_id:
-            base_query += " AND credit_card_id = :credit_card_id"
-            params["credit_card_id"] = credit_card_id
+        # Calcular total da fatura
+        total = sum(t.amount for t in transactions)
 
-        query = text(base_query)
-        result = session.execute(query, params).scalar()
-        return float(result) if result is not None else 0.0
+        # Obter dados do cartão
+        card = session.query(CreditCard).filter_by(id=card_id).first()
+
+        return {
+            "transactions": transactions,
+            "total": total,
+            "card": card,
+            "statement_month": statement_month
+        }
     finally:
-        close_db_session(session)
+        if close_session:
+            close_db_session(session)
 
-def get_credit_card_transaction_by_category(year, month=None, credit_card_id=None):
+
+def get_credit_card_transactions_by_period(card_id, start_date, end_date, session=None):
     """
-    Obtém a soma das transações de cartão de crédito agrupadas por categoria
+    Obtém transações de cartão de crédito em um período específico
 
     Args:
-        year (int): Ano
-        month (int, optional): Mês (1-12). Se não for fornecido, retorna dados do ano todo
-        credit_card_id (int, optional): ID do cartão para filtrar
+        card_id (int): ID do cartão
+        start_date (date): Data inicial
+        end_date (date): Data final
+        session: Sessão SQLAlchemy opcional
 
     Returns:
-        list: Lista de dicionários com categoria e total
+        list: Lista de objetos CreditCardTransaction
     """
-    session = get_db_session()
+    close_session = False
+    if not session:
+        session = get_db_session()
+        close_session = True
+
     try:
-        params = {"year": year}
-
-        base_query = """
-            SELECT c.name as category_name, c.color, SUM(t.amount) as total
-            FROM credit_card_transactions t
-            JOIN categories c ON t.category_id = c.id
-            WHERE EXTRACT(YEAR FROM t.date) = :year
-        """
-
-        if month:
-            base_query += " AND EXTRACT(MONTH FROM t.date) = :month"
-            params["month"] = month
-
-        if credit_card_id:
-            base_query += " AND t.credit_card_id = :credit_card_id"
-            params["credit_card_id"] = credit_card_id
-
-        base_query += " GROUP BY c.name, c.color ORDER BY total DESC"
-
-        query = text(base_query)
-        results = session.execute(query, params).fetchall()
-        return [dict(row) for row in results]
+        return session.query(CreditCardTransaction).filter(
+            CreditCardTransaction.credit_card_id == card_id,
+            CreditCardTransaction.purchase_date >= start_date,
+            CreditCardTransaction.purchase_date <= end_date
+        ).order_by(CreditCardTransaction.purchase_date.desc()).all()
     finally:
-        close_db_session(session)
+        if close_session:
+            close_db_session(session)
 
-def get_pending_credit_card_installments(credit_card_id=None):
+
+def get_credit_card_available_limit(card_id, session=None):
     """
-    Obtém as parcelas pendentes de cartão de crédito
+    Calcula o limite disponível em um cartão de crédito
 
     Args:
-        credit_card_id (int, optional): ID do cartão para filtrar
+        card_id (int): ID do cartão
+        session: Sessão SQLAlchemy opcional
 
     Returns:
-        list: Lista de dicionários com as parcelas pendentes
+        float: Limite disponível
     """
-    session = get_db_session()
+    close_session = False
+    if not session:
+        session = get_db_session()
+        close_session = True
+
     try:
-        params = {}
+        # Obter informações do cartão
+        card = session.query(CreditCard).filter_by(id=card_id).first()
 
-        base_query = """
-            SELECT t.*, 
-                   c.name as category_name, c.color as category_color,
-                   cc.name as credit_card_name,
-                   (t.installments - t.current_installment) as remaining_installments
-            FROM credit_card_transactions t
-            LEFT JOIN categories c ON t.category_id = c.id
-            LEFT JOIN credit_cards cc ON t.credit_card_id = cc.id
-            WHERE t.installments > 1 AND t.current_installment < t.installments
-        """
+        if not card:
+            return 0.0
 
-        if credit_card_id:
-            base_query += " AND t.credit_card_id = :credit_card_id"
-            params["credit_card_id"] = credit_card_id
+        # Obter o mês atual para a fatura
+        today = datetime.date.today()
+        statement_month = f"{today.year:04d}-{today.month:02d}"
 
-        base_query += " ORDER BY t.date DESC"
+        # Calcular o total de compras pendentes (não pagas) na fatura atual
+        current_statement_total = session.query(func.sum(CreditCardTransaction.amount)).filter(
+            CreditCardTransaction.credit_card_id == card_id,
+            CreditCardTransaction.statement_month == statement_month
+        ).scalar() or 0.0
 
-        query = text(base_query)
-        results = session.execute(query, params).fetchall()
+        # Limite disponível = limite total - valor usado
+        available_limit = card.limit_amount - float(current_statement_total)
 
-        # Converter para lista de dicionários
-        return [dict(row) for row in results]
+        return available_limit
     finally:
-        close_db_session(session)
+        if close_session:
+            close_db_session(session)

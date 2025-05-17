@@ -1,136 +1,74 @@
 """
-    Queries para operações com tabela de categorias
+    Consultas relacionadas a categorias
 """
 
 from db.database import get_db_session, close_db_session
-from sqlalchemy import text
+from db.models import Category
 
-def get_all_categories(active_only=True):
-    """
-    Obtém todas as categorias
 
-    Args:
-        active_only (bool, optional): Filtrar apenas categorias ativas
-
-    Returns:
-        list: Lista de dicionários com as categorias
-    """
-    session = get_db_session()
-    try:
-        base_query = """
-            SELECT id, name, type, color, active
-            FROM categories
-        """
-
-        params = {}
-
-        if active_only:
-            base_query += " WHERE active = :active"
-            params["active"] = True
-
-        base_query += " ORDER BY type, name"
-
-        query = text(base_query)
-        results = session.execute(query, params).fetchall()
-
-        # Converter para lista de dicionários
-        return [dict(row) for row in results]
-    finally:
-        close_db_session(session)
-
-def get_categories_by_type(category_type, active_only=True):
-    """
-    Obtém categorias de um determinado tipo
-
-    Args:
-        category_type (str): Tipo da categoria ('income', 'expense', 'credit')
-        active_only (bool, optional): Filtrar apenas categorias ativas
-
-    Returns:
-        list: Lista de dicionários com as categorias
-    """
-    session = get_db_session()
-    try:
-        base_query = """
-            SELECT id, name, type, color, active
-            FROM categories
-            WHERE type = :type
-        """
-
-        params = {"type": category_type}
-
-        if active_only:
-            base_query += " AND active = :active"
-            params["active"] = True
-
-        base_query += " ORDER BY name"
-
-        query = text(base_query)
-        results = session.execute(query, params).fetchall()
-
-        # Converter para lista de dicionários formatados para componentes dropdown
-        dropdown_options = [
-            {
-                "id": row["id"],
-                "label": row["name"],
-                "value": row["id"],
-                "color": row["color"]
-            }
-            for row in results
-        ]
-
-        return dropdown_options
-    finally:
-        close_db_session(session)
-
-def get_category_by_id(category_id):
+def get_category_by_id(category_id, session=None):
     """
     Obtém uma categoria pelo ID
 
     Args:
         category_id (int): ID da categoria
+        session: Sessão SQLAlchemy opcional
 
     Returns:
-        dict: Dados da categoria ou None se não encontrada
+        Category: Objeto da categoria ou None se não encontrado
     """
-    session = get_db_session()
+    close_session = False
+    if not session:
+        session = get_db_session()
+        close_session = True
+
     try:
-        query = text("""
-            SELECT id, name, type, color, active
-            FROM categories
-            WHERE id = :category_id
-        """)
-
-        result = session.execute(query, {"category_id": category_id}).fetchone()
-
-        if result:
-            # Converter para dicionário
-            return dict(result)
-        return None
+        return session.query(Category).filter_by(id=category_id).first()
     finally:
-        close_db_session(session)
+        if close_session:
+            close_db_session(session)
 
-def get_category_usage_count(category_id):
+
+def get_all_categories(session=None):
     """
-    Obtém o número de vezes que uma categoria foi usada em transações
+    Obtém todas as categorias
 
     Args:
-        category_id (int): ID da categoria
+        session: Sessão SQLAlchemy opcional
 
     Returns:
-        int: Número de usos da categoria
+        list: Lista de objetos Category
     """
-    session = get_db_session()
-    try:
-        query = text("""
-            SELECT
-                (SELECT COUNT(*) FROM incomes WHERE category_id = :category_id) +
-                (SELECT COUNT(*) FROM expenses WHERE category_id = :category_id) +
-                (SELECT COUNT(*) FROM credit_card_transactions WHERE category_id = :category_id)
-                AS usage_count
-        """)
+    close_session = False
+    if not session:
+        session = get_db_session()
+        close_session = True
 
-        result = session.execute(query, {"category_id": category_id}).scalar()
-        return int(result) if result is not None else 0
+    try:
+        return session.query(Category).order_by(Category.name).all()
     finally:
-        close_db_session(session)
+        if close_session:
+            close_db_session(session)
+
+
+def get_categories_by_type(category_type, session=None):
+    """
+    Obtém categorias por tipo
+
+    Args:
+        category_type (str): Tipo da categoria ('income', 'expense', 'credit')
+        session: Sessão SQLAlchemy opcional
+
+    Returns:
+        list: Lista de objetos Category
+    """
+    close_session = False
+    if not session:
+        session = get_db_session()
+        close_session = True
+
+    try:
+        return session.query(Category).filter_by(type=category_type).order_by(Category.name).all()
+    finally:
+        if close_session:
+            close_db_session(session)

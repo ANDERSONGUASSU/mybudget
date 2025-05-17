@@ -1,148 +1,135 @@
 """
-    Queries para operações com tabela de receitas
+    Consultas relacionadas a receitas
 """
 
 from db.database import get_db_session, close_db_session
-from sqlalchemy import func, extract, text
-from datetime import datetime
+from db.models import Income
+from sqlalchemy import func, extract
 
-def get_income_by_id(income_id):
+
+def get_income_by_id(income_id, session=None):
     """
-    Obtém uma receita específica pelo ID
+    Obtém uma receita pelo ID
 
     Args:
         income_id (int): ID da receita
+        session: Sessão SQLAlchemy opcional
 
     Returns:
-        dict: Dados da receita ou None se não encontrada
+        Income: Objeto da receita ou None se não encontrado
     """
-    session = get_db_session()
+    close_session = False
+    if not session:
+        session = get_db_session()
+        close_session = True
+
     try:
-        query = text("""
-            SELECT i.*, 
-                   c.name as category_name, c.color as category_color,
-                   a.name as account_name
-            FROM incomes i
-            LEFT JOIN categories c ON i.category_id = c.id
-            LEFT JOIN accounts a ON i.account_id = a.id
-            WHERE i.id = :income_id
-        """)
-
-        result = session.execute(query, {"income_id": income_id}).fetchone()
-
-        if result:
-            # Converter para dicionário
-            return dict(result)
-        return None
+        return session.query(Income).filter_by(id=income_id).first()
     finally:
-        close_db_session(session)
+        if close_session:
+            close_db_session(session)
 
-def get_incomes_by_period(start_date, end_date):
+
+def get_incomes_by_period(start_date, end_date, session=None):
     """
-    Obtém todas as receitas em um determinado período
+    Obtém receitas em um período específico
 
     Args:
-        start_date (str ou datetime): Data inicial
-        end_date (str ou datetime): Data final
+        start_date (date): Data inicial
+        end_date (date): Data final
+        session: Sessão SQLAlchemy opcional
 
     Returns:
-        list: Lista de dicionários com as receitas
+        list: Lista de objetos Income
     """
-    session = get_db_session()
+    close_session = False
+    if not session:
+        session = get_db_session()
+        close_session = True
+
     try:
-        # Converter datas se necessário
-        if isinstance(start_date, str):
-            start_date = datetime.strptime(start_date, "%Y-%m-%d").date()
-        elif isinstance(start_date, datetime):
-            start_date = start_date.date()
-
-        if isinstance(end_date, str):
-            end_date = datetime.strptime(end_date, "%Y-%m-%d").date()
-        elif isinstance(end_date, datetime):
-            end_date = end_date.date()
-
-        query = text("""
-            SELECT i.*, 
-                   c.name as category_name, c.color as category_color,
-                   a.name as account_name
-            FROM incomes i
-            LEFT JOIN categories c ON i.category_id = c.id
-            LEFT JOIN accounts a ON i.account_id = a.id
-            WHERE i.date BETWEEN :start_date AND :end_date
-            ORDER BY i.date DESC
-        """)
-
-        results = session.execute(query, {
-            "start_date": start_date,
-            "end_date": end_date
-        }).fetchall()
-
-        # Converter para lista de dicionários
-        return [dict(row) for row in results]
+        return session.query(Income).filter(
+            Income.date >= start_date,
+            Income.date <= end_date
+        ).order_by(Income.date.desc()).all()
     finally:
-        close_db_session(session)
+        if close_session:
+            close_db_session(session)
 
-def get_monthly_income_sum(year, month):
+
+def get_incomes_by_month(year, month, session=None):
     """
-    Obtém a soma total de receitas de um mês específico
+    Obtém receitas de um mês específico
 
     Args:
         year (int): Ano
         month (int): Mês (1-12)
+        session: Sessão SQLAlchemy opcional
 
     Returns:
-        float: Soma das receitas no mês
+        list: Lista de objetos Income
     """
-    session = get_db_session()
+    close_session = False
+    if not session:
+        session = get_db_session()
+        close_session = True
+
     try:
-        query = text("""
-            SELECT COALESCE(SUM(amount), 0) as total
-            FROM incomes
-            WHERE EXTRACT(YEAR FROM date) = :year
-            AND EXTRACT(MONTH FROM date) = :month
-        """)
-
-        result = session.execute(query, {"year": year, "month": month}).scalar()
-        return float(result) if result is not None else 0.0
+        return session.query(Income).filter(
+            extract('year', Income.date) == year,
+            extract('month', Income.date) == month
+        ).order_by(Income.date.desc()).all()
     finally:
-        close_db_session(session)
+        if close_session:
+            close_db_session(session)
 
-def get_income_by_category(year, month=None):
+
+def get_incomes_by_category(category_id, session=None):
     """
-    Obtém a soma das receitas agrupadas por categoria
+    Obtém receitas de uma categoria específica
+
+    Args:
+        category_id (int): ID da categoria
+        session: Sessão SQLAlchemy opcional
+
+    Returns:
+        list: Lista de objetos Income
+    """
+    close_session = False
+    if not session:
+        session = get_db_session()
+        close_session = True
+
+    try:
+        return session.query(Income).filter_by(category_id=category_id).order_by(Income.date.desc()).all()
+    finally:
+        if close_session:
+            close_db_session(session)
+
+
+def get_monthly_income_sum(year, month, session=None):
+    """
+    Obtém a soma de receitas em um mês específico
 
     Args:
         year (int): Ano
-        month (int, optional): Mês (1-12). Se não for fornecido, retorna dados do ano todo
+        month (int): Mês (1-12)
+        session: Sessão SQLAlchemy opcional
 
     Returns:
-        list: Lista de dicionários com categoria e total
+        float: Soma das receitas
     """
-    session = get_db_session()
-    try:
-        if month:
-            query = text("""
-                SELECT c.name as category_name, c.color, SUM(i.amount) as total
-                FROM incomes i
-                JOIN categories c ON i.category_id = c.id
-                WHERE EXTRACT(YEAR FROM i.date) = :year
-                AND EXTRACT(MONTH FROM i.date) = :month
-                GROUP BY c.name, c.color
-                ORDER BY total DESC
-            """)
-            params = {"year": year, "month": month}
-        else:
-            query = text("""
-                SELECT c.name as category_name, c.color, SUM(i.amount) as total
-                FROM incomes i
-                JOIN categories c ON i.category_id = c.id
-                WHERE EXTRACT(YEAR FROM i.date) = :year
-                GROUP BY c.name, c.color
-                ORDER BY total DESC
-            """)
-            params = {"year": year}
+    close_session = False
+    if not session:
+        session = get_db_session()
+        close_session = True
 
-        results = session.execute(query, params).fetchall()
-        return [dict(row) for row in results]
+    try:
+        result = session.query(func.sum(Income.amount)).filter(
+            extract('year', Income.date) == year,
+            extract('month', Income.date) == month
+        ).scalar()
+        return float(result) if result else 0.0
     finally:
-        close_db_session(session)
+        if close_session:
+            close_db_session(session)
