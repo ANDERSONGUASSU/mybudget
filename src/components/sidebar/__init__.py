@@ -14,7 +14,7 @@ from src.components.sidebar.modals.credit_card_modal import get_credit_card_moda
 from src.components.sidebar.nav import get_nav
 
 # Importar callbacks para registro (não precisa usar diretamente)
-import src.components.sidebar.callbacks  # noqa
+import callbacks  # noqa
 
 # Layout principal do sidebar
 layout = dbc.Col([
