@@ -6,7 +6,7 @@ from db.database import get_db_session, close_db_session
 from db.models.account_model import Account
 
 
-def create_account(name, balance=0.0):
+def create_account(name, type, balance=0.0):
     """
     Cria uma nova conta bancária
 
@@ -24,7 +24,7 @@ def create_account(name, balance=0.0):
 
     try:
         # Criar nova conta
-        new_account = Account(name=name, balance=balance)
+        new_account = Account(name=name, type=type, balance=balance)
 
         # Adicionar ao banco de dados
         session.add(new_account)
@@ -34,6 +34,7 @@ def create_account(name, balance=0.0):
         return {
             'id': new_account.id,
             'name': new_account.name,
+            'type': new_account.type,
             'balance': new_account.balance
         }
     except Exception as e:

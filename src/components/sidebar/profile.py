@@ -7,6 +7,9 @@ import dash_bootstrap_components as dbc
 
 # Componente de perfil
 def get_profile():
+    """
+        Componente de perfil do usuário para o sidebar.
+    """
     return [
         html.H2("Perfil", className="text-center text-primary"),
         html.Div([

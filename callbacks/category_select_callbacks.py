@@ -5,27 +5,24 @@
 from dash.dependencies import Input, Output
 from app import app
 
-from controllers.category_controllers import get_categories_for_type
-
 
 # Callback para preencher o select de categorias de receita no modal de receita
 @app.callback(
     Output("income_category", "options"),
     [
         Input("modal-income", "is_open"),
-        Input("add_category_button_income", "n_clicks"),
-        Input("delete_category_button_income", "n_clicks")
+        Input("categories-store", "data")
     ]
 )
-def preencher_categorias_receita(is_open, add_clicks, delete_clicks):
+def preencher_categorias_receita(is_open, categories_data):
     """
     Preenche o select de categorias no modal de receita
     """
-    if not is_open and add_clicks is None and delete_clicks is None:
+    if not is_open or not categories_data:
         return []
 
-    # Buscar categorias de receita no banco de dados
-    categories = get_categories_for_type("income")
+    # Buscar categorias de receita do store
+    categories = categories_data["by_type"]["income"]
 
     # Formatar para as opções do select
     options = [{"label": cat["name"], "value": cat["id"]} for cat in categories]
@@ -38,19 +35,18 @@ def preencher_categorias_receita(is_open, add_clicks, delete_clicks):
     Output("expense_category", "options"),
     [
         Input("modal-expense", "is_open"),
-        Input("add_category_button_expense", "n_clicks"),
-        Input("delete_category_button_expense", "n_clicks")
+        Input("categories-store", "data")
     ]
 )
-def preencher_categorias_despesa(is_open, add_clicks, delete_clicks):
+def preencher_categorias_despesa(is_open, categories_data):
     """
     Preenche o select de categorias no modal de despesa
     """
-    if not is_open and add_clicks is None and delete_clicks is None:
+    if not is_open or not categories_data:
         return []
 
-    # Buscar categorias de despesa no banco de dados
-    categories = get_categories_for_type("expense")
+    # Buscar categorias de despesa do store
+    categories = categories_data["by_type"]["expense"]
 
     # Formatar para as opções do select
     options = [{"label": cat["name"], "value": cat["id"]} for cat in categories]
@@ -63,23 +59,22 @@ def preencher_categorias_despesa(is_open, add_clicks, delete_clicks):
     Output("credit_card_category", "options"),
     [
         Input("modal-credit-card", "is_open"),
-        Input("add_category_button_credit_card", "n_clicks"),
-        Input("delete_category_button_credit_card", "n_clicks")
+        Input("categories-store", "data")
     ]
 )
-def preencher_categorias_cartao(is_open, add_clicks, delete_clicks):
+def preencher_categorias_cartao(is_open, categories_data):
     """
     Preenche o select de categorias no modal de cartão de crédito
     """
-    if not is_open and add_clicks is None and delete_clicks is None:
+    if not is_open or not categories_data:
         return []
 
-    # Buscar categorias de cartão de crédito no banco de dados
-    categories = get_categories_for_type("credit")
+    # Buscar categorias de cartão de crédito do store
+    categories = categories_data["by_type"]["credit"]
 
     # Se não tiver categorias específicas para cartão de crédito, usar as de despesa
     if not categories:
-        categories = get_categories_for_type("expense")
+        categories = categories_data["by_type"]["expense"]
 
     # Formatar para as opções do select
     options = [{"label": cat["name"], "value": cat["id"]} for cat in categories]

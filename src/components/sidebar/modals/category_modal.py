@@ -47,6 +47,7 @@ def get_add_category_modal(text):
                             id=f"delete_category_button_{text}",
                             color="danger",
                             className="mb-3 btn btn-danger"),
+
                     ], width=6, className="mb-3 p-2")
                 ])
             ])

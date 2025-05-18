@@ -2,9 +2,9 @@
     Consultas relacionadas a receitas
 """
 
+from sqlalchemy import func, extract
 from db.database import get_db_session, close_db_session
 from db.models import Income
-from sqlalchemy import func, extract
 
 
 def get_income_by_id(income_id, session=None):

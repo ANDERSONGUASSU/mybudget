@@ -1,5 +1,5 @@
 """
-    Consultas relacionadas a cartões de crédito e suas transações
+    Consultas relacionadas a cartões de crédito
 """
 
 from db.database import get_db_session, close_db_session
@@ -8,16 +8,16 @@ from sqlalchemy import func
 import datetime
 
 
-def get_credit_card_by_id(card_id, session=None):
+def get_credit_card_by_id(credit_card_id, session=None):
     """
     Obtém um cartão de crédito pelo ID
 
     Args:
-        card_id (int): ID do cartão
+        credit_card_id (int): ID do cartão de crédito
         session: Sessão SQLAlchemy opcional
 
     Returns:
-        CreditCard: Objeto do cartão ou None se não encontrado
+        CreditCard: Objeto do cartão de crédito ou None se não encontrado
     """
     close_session = False
     if not session:
@@ -25,7 +25,7 @@ def get_credit_card_by_id(card_id, session=None):
         close_session = True
 
     try:
-        return session.query(CreditCard).filter_by(id=card_id).first()
+        return session.query(CreditCard).filter_by(id=credit_card_id).first()
     finally:
         if close_session:
             close_db_session(session)

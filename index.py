@@ -18,6 +18,11 @@ from src.components.extrats import layout as extrats_layout
 content = html.Div(id="page-content")
 
 app.layout = dbc.Container(children=[
+    # Stores para armazenar dados globais
+    dcc.Store(id="accounts-store", storage_type="session"),  # Armazena contas
+    dcc.Store(id="categories-store", storage_type="session"),  # Armazena categorias
+    dcc.Store(id="credit-cards-store", storage_type="session"),  # Armazena cartões
+
     dbc.Row([
         dbc.Col(
             [

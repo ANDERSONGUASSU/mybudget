@@ -3,8 +3,8 @@
 """
 
 from dash.dependencies import Input, Output, State
-from app import app
 import dash_bootstrap_components as dbc
+from app import app
 
 from controllers.category_controllers import (
     create_category,
@@ -120,6 +120,7 @@ def update_expense_category_checklist(add_clicks, delete_clicks):
     Input("delete_category_button_credit_card", "n_clicks")
 )
 def update_credit_card_category_checklist(add_clicks, delete_clicks):
+
     """
     Atualiza a checklist de categorias de cartão de crédito
     """
@@ -156,9 +157,15 @@ def delete_income_categories(n_clicks, category_ids):
     if error_count == 0:
         return dbc.Alert(f"{success_count} categoria(s) excluída(s) com sucesso!", color="success")
     elif success_count == 0:
-        return dbc.Alert(f"Erro ao excluir {error_count} categoria(s). Verifique se não estão sendo usadas em transações.", color="danger")
+        result = f"Erro ao excluir {error_count} categoria(s). Verifique se não estão sendo usadas em transações."
+        return dbc.Alert(result, color="danger")
     else:
-        return dbc.Alert(f"{success_count} categoria(s) excluída(s) com sucesso. {error_count} categoria(s) não puderam ser excluídas. Verifique se não estão sendo usadas em transações.", color="warning")
+        result = [
+            f"{success_count} categoria(s) excluída(s) com sucesso.",
+            f"{error_count} categoria(s) não puderam ser excluídas.",
+            "Verifique se não estão sendo usadas em transações."
+        ]
+        return dbc.Alert(result, color="warning")
 
 
 @app.callback(
@@ -188,9 +195,15 @@ def delete_expense_categories(n_clicks, category_ids):
     if error_count == 0:
         return dbc.Alert(f"{success_count} categoria(s) excluída(s) com sucesso!", color="success")
     elif success_count == 0:
-        return dbc.Alert(f"Erro ao excluir {error_count} categoria(s). Verifique se não estão sendo usadas em transações.", color="danger")
+        result = f"Erro ao excluir {error_count} categoria(s). Verifique se não estão sendo usadas em transações."
+        return dbc.Alert(result, color="danger")
     else:
-        return dbc.Alert(f"{success_count} categoria(s) excluída(s) com sucesso. {error_count} categoria(s) não puderam ser excluídas. Verifique se não estão sendo usadas em transações.", color="warning")
+        result = [
+            f"{success_count} categoria(s) excluída(s) com sucesso.",
+            f"{error_count} categoria(s) não puderam ser excluídas.",
+            "Verifique se não estão sendo usadas em transações."
+        ]
+        return dbc.Alert(result, color="warning")
 
 
 @app.callback(
@@ -220,6 +233,12 @@ def delete_credit_card_categories(n_clicks, category_ids):
     if error_count == 0:
         return dbc.Alert(f"{success_count} categoria(s) excluída(s) com sucesso!", color="success")
     elif success_count == 0:
-        return dbc.Alert(f"Erro ao excluir {error_count} categoria(s). Verifique se não estão sendo usadas em transações.", color="danger")
+        result = f"Erro ao excluir {error_count} categoria(s). Verifique se não estão sendo usadas em transações."
+        return dbc.Alert(result, color="danger")
     else:
-        return dbc.Alert(f"{success_count} categoria(s) excluída(s) com sucesso. {error_count} categoria(s) não puderam ser excluídas. Verifique se não estão sendo usadas em transações.", color="warning")
+        result = [
+            f"{success_count} categoria(s) excluída(s) com sucesso.",
+            f"{error_count} categoria(s) não puderam ser excluídas.",
+            "Verifique se não estão sendo usadas em transações."
+        ]
+        return dbc.Alert(result, color="warning")
