@@ -2,8 +2,8 @@
     Controlador para obter o resumo mensal financeiro
 """
 
-from db.queries.dashboard_queries import get_monthly_summary as get_summary
 import datetime
+from db.queries.dashboard_queries import get_monthly_summary as get_summary
 
 
 def get_monthly_summary(year=None, month=None):
@@ -12,7 +12,7 @@ def get_monthly_summary(year=None, month=None):
     Se não forem fornecidos ano e mês, retorna o resumo do mês atual.
 
     Args:
-        year (int, optional): Ano 
+        year (int, optional): Ano
         month (int, optional): Mês (1-12)
 
     Returns:

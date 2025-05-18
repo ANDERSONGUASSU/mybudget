@@ -2,8 +2,8 @@
     Controlador para obter o detalhamento de despesas por categoria
 """
 
-from db.queries.dashboard_queries import get_expense_by_category, get_credit_card_expense_by_category
 import datetime
+from db.queries.dashboard_queries import get_expense_by_category, get_credit_card_expense_by_category
 
 
 def get_expense_breakdown(year=None, month=None):
@@ -12,7 +12,7 @@ def get_expense_breakdown(year=None, month=None):
     Se não forem fornecidos ano e mês, retorna o detalhamento do mês atual.
 
     Args:
-        year (int, optional): Ano 
+        year (int, optional): Ano
         month (int, optional): Mês (1-12)
 
     Returns:

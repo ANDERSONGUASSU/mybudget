@@ -13,7 +13,8 @@ def _parse_date(date_str):
     """Converte string de data para objeto date"""
     try:
         return datetime.datetime.strptime(date_str, "%Y-%m-%d").date()
-    except ValueError:
+    except ValueError as e:
+        print(f"Erro de tipo de dados ao converter data: {e}")
         return None
 
 

@@ -2,6 +2,7 @@
     Consultas relacionadas a categorias
 """
 
+from sqlalchemy.exc import SQLAlchemyError
 from db.database import get_db_session, close_db_session
 from db.models import Category
 
@@ -110,10 +111,17 @@ def update_category_in_db(category_id, name=None, category_type=None, color=None
 
         session.commit()
         return category
-    except Exception as e:
-        if session:
-            session.rollback()
+    except SQLAlchemyError as e:
+        session.rollback()
         print(f"Erro ao atualizar categoria: {e}")
+        return None
+    except ValueError as e:
+        session.rollback()
+        print(f"Erro de tipo de dados ao atualizar categoria: {e}")
+        return None
+    except AttributeError as e:
+        session.rollback()
+        print(f"Erro de atributo ao atualizar categoria: {e}")
         return None
     finally:
         if close_session:
@@ -147,10 +155,17 @@ def delete_category_from_db(category_id, session=None):
         session.delete(category)
         session.commit()
         return True
-    except Exception as e:
-        if session:
-            session.rollback()
+    except SQLAlchemyError as e:
+        session.rollback()
         print(f"Erro ao excluir categoria: {e}")
+        return False
+    except ValueError as e:
+        session.rollback()
+        print(f"Erro de tipo de dados ao excluir categoria: {e}")
+        return False
+    except AttributeError as e:
+        session.rollback()
+        print(f"Erro de atributo ao excluir categoria: {e}")
         return False
     finally:
         if close_session:

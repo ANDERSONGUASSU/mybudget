@@ -2,6 +2,7 @@
     Controlador para obter cartões de crédito
 """
 
+from sqlalchemy.exc import SQLAlchemyError
 from db.database import get_db_session, close_db_session
 from db.queries.credit_card_queries import get_all_credit_cards, get_credit_card_by_id
 
@@ -32,8 +33,17 @@ def get_credit_cards():
         ]
 
         return cards_dict
-    except Exception as e:
+    except SQLAlchemyError as e:
+        session.rollback()
         print(f"Erro ao obter cartões de crédito: {e}")
+        return []
+    except ValueError as e:
+        session.rollback()
+        print(f"Erro de tipo de dados ao obter cartões de crédito: {e}")
+        return []
+    except AttributeError as e:
+        session.rollback()
+        print(f"Erro de atributo ao obter cartões de crédito: {e}")
         return []
     finally:
         close_db_session(session)
@@ -68,8 +78,17 @@ def get_credit_card(card_id):
         }
 
         return card_dict
-    except Exception as e:
+    except SQLAlchemyError as e:
+        session.rollback()
         print(f"Erro ao obter cartão de crédito: {e}")
+        return None
+    except ValueError as e:
+        session.rollback()
+        print(f"Erro de tipo de dados ao obter cartão de crédito: {e}")
+        return None
+    except AttributeError as e:
+        session.rollback()
+        print(f"Erro de atributo ao obter cartão de crédito: {e}")
         return None
     finally:
         close_db_session(session)

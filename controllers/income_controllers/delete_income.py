@@ -45,6 +45,13 @@ def delete_income(income_id):
         session.rollback()
         print(f"Erro ao deletar receita: {e}")
         return False
-
+    except ValueError as e:
+        session.rollback()
+        print(f"Erro de tipo de dados ao deletar receita: {e}")
+        return False
+    except AttributeError as e:
+        session.rollback()
+        print(f"Erro de atributo ao deletar receita: {e}")
+        return False
     finally:
         close_db_session(session)

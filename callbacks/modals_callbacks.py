@@ -1,6 +1,10 @@
+"""
+    Callbacks para gerenciar todos os modais
+"""
+
 from dash import callback_context as ctx
-from app import app
 from dash.dependencies import Input, Output, State
+from app import app
 
 @app.callback(
     Output("modal-income", "is_open"),
@@ -14,7 +18,17 @@ from dash.dependencies import Input, Output, State
     State("modal-credit-card", "is_open"),
     prevent_initial_call=True
 )
-def gerenciar_todos_modais(n_clicks_receita, n_clicks_despesa, n_clicks_cartao, is_open_income, is_open_expense, is_open_credit_card):
+def gerenciar_todos_modais(
+    n_clicks_receita,
+    n_clicks_despesa,
+    n_clicks_cartao,
+    is_open_income,
+    is_open_expense,
+    is_open_credit_card
+):
+    """
+    Gerencia todos os modais
+    """
     # Identificar qual botão foi clicado
     trigger_id = ctx.triggered[0]['prop_id'].split('.')[0]
 
@@ -36,6 +50,9 @@ def gerenciar_todos_modais(n_clicks_receita, n_clicks_despesa, n_clicks_cartao, 
     prevent_initial_call=True
 )
 def fechar_modal_receita(n_clicks, is_open):
+    """
+    Fecha o modal de receita ao clicar em Cancelar
+    """
     if n_clicks:
         return False
     return is_open
@@ -49,6 +66,10 @@ def fechar_modal_receita(n_clicks, is_open):
     prevent_initial_call=True
 )
 def fechar_modal_despesa(n_clicks, is_open):
+    """
+    Fecha o modal de despesa ao clicar em Cancelar
+    """
+
     if n_clicks:
         return False
     return is_open
@@ -62,6 +83,9 @@ def fechar_modal_despesa(n_clicks, is_open):
     prevent_initial_call=True
 )
 def fechar_modal_cartao(n_clicks, is_open):
+    """
+    Fecha o modal de cartão de crédito ao clicar em Cancelar
+    """
     if n_clicks:
         return False
     return is_open

@@ -56,7 +56,8 @@ def get_incomes_for_period(start_date, end_date):
     try:
         start = datetime.datetime.strptime(start_date, "%Y-%m-%d").date()
         end = datetime.datetime.strptime(end_date, "%Y-%m-%d").date()
-    except ValueError:
+    except ValueError as e:
+        print(f"Erro de tipo de dados ao converter datas: {e}")
         return []
 
     incomes = get_incomes_by_period(start, end)

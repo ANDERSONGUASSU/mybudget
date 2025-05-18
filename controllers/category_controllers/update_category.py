@@ -2,6 +2,7 @@
     Controlador para atualizar uma categoria existente
 """
 
+from sqlalchemy.exc import SQLAlchemyError
 from db.database import get_db_session, close_db_session
 from db.models import Category
 
@@ -54,9 +55,17 @@ def update_category(category_id, name=None, category_type=None, color=None):
             'type': category.type,
             'color': category.color
         }
-    except Exception as e:
+    except SQLAlchemyError as e:
         session.rollback()
         print(f"Erro ao atualizar categoria: {e}")
+        return None
+    except ValueError as e:
+        session.rollback()
+        print(f"Erro de tipo de dados ao atualizar categoria: {e}")
+        return None
+    except AttributeError as e:
+        session.rollback()
+        print(f"Erro de atributo ao atualizar categoria: {e}")
         return None
     finally:
         close_db_session(session)

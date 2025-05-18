@@ -19,7 +19,7 @@ def get_accounts():
         {
             'id': account.id,
             'name': account.name,
-            'type': account.type,
+            'type_account': account.type_account,
             'balance': account.balance
         }
         for account in accounts
@@ -47,7 +47,7 @@ def get_account(account_id):
     account_dict = {
         'id': account.id,
         'name': account.name,
-        'type': account.type,
+        'type_account': account.type_account,
         'balance': account.balance
     }
 

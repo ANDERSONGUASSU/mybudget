@@ -6,6 +6,7 @@ import os
 import sqlite3
 from sqlalchemy import create_engine
 from sqlalchemy.orm import sessionmaker
+from sqlalchemy.exc import SQLAlchemyError
 from db.models.base import Base
 from db.models import Category, Account, CreditCard
 
@@ -23,9 +24,11 @@ def get_db_session():
     session = Session()
     try:
         return session
-    except Exception as e:
+    except SQLAlchemyError as e:
         session.rollback()
+        print(f"Erro ao obter sessão do banco de dados: {e}")
         raise e
+
 
 def close_db_session(session):
     """
@@ -93,12 +96,20 @@ def init_db():
 
         # Commit das alterações
         session.commit()
-    except Exception as e:
+    except SQLAlchemyError as e:
         session.rollback()
+        print(f"Erro ao inicializar o banco de dados: {e}")
+        raise e
+    except ValueError as e:
+        session.rollback()
+        print(f"Erro de tipo de dados ao inicializar o banco de dados: {e}")
+        raise e
+    except AttributeError as e:
+        session.rollback()
+        print(f"Erro de atributo ao inicializar o banco de dados: {e}")
         raise e
     finally:
         close_db_session(session)
-
 def get_sqlite_connection():
     """
         Get a direct SQLite connection (for raw SQL if needed)

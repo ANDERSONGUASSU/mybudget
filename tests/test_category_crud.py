@@ -2,6 +2,8 @@
     Testes para o CRUD de categorias
 """
 
+import sys
+import os
 from controllers.category_controllers import (
     create_category,
     get_categories,
@@ -10,8 +12,6 @@ from controllers.category_controllers import (
     update_category,
     delete_category
 )
-import sys
-import os
 
 # Adicionando o diretório raiz ao path
 sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), '..')))

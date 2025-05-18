@@ -2,6 +2,7 @@
     Controlador para atualizar uma conta bancária
 """
 
+from sqlalchemy.exc import SQLAlchemyError
 from db.database import get_db_session, close_db_session
 from db.queries.account_queries import get_account_by_id
 
@@ -43,9 +44,17 @@ def update_account(account_id, name=None, balance=None):
             'name': account.name,
             'balance': account.balance
         }
-    except Exception as e:
+    except SQLAlchemyError as e:
         session.rollback()
         print(f"Erro ao atualizar conta: {e}")
+        return None
+    except ValueError as e:
+        session.rollback()
+        print(f"Erro de tipo de dados ao atualizar conta: {e}")
+        return None
+    except AttributeError as e:
+        session.rollback()
+        print(f"Erro de atributo ao atualizar conta: {e}")
         return None
     finally:
         close_db_session(session)

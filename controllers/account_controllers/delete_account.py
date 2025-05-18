@@ -2,10 +2,10 @@
     Controlador para excluir uma conta bancária
 """
 
+from sqlalchemy.exc import SQLAlchemyError
 from db.database import get_db_session, close_db_session
 from db.queries.account_queries import get_account_by_id
 from db.models import Income, Expense
-
 
 def delete_account(account_id):
     """
@@ -39,9 +39,17 @@ def delete_account(account_id):
         session.commit()
 
         return True
-    except Exception as e:
+    except SQLAlchemyError as e:
         session.rollback()
         print(f"Erro ao excluir conta: {e}")
+        return False
+    except ValueError as e:
+        session.rollback()
+        print(f"Erro de tipo de dados ao excluir conta: {e}")
+        return False
+    except AttributeError as e:
+        session.rollback()
+        print(f"Erro de atributo ao excluir conta: {e}")
         return False
     finally:
         close_db_session(session)

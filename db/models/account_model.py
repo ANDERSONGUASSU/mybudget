@@ -14,7 +14,7 @@ class Account(Base):
 
     id = Column(Integer, primary_key=True)
     name = Column(String(255), nullable=False, name="nome")
-    type = Column(String(50), nullable=False, name="tipo")
+    type_account = Column(String(50), nullable=False, name="tipo_conta")
     balance = Column(Float, default=0.0, name="saldo")
     created_at = Column(DateTime, default=text("CURRENT_TIMESTAMP"))
 
@@ -23,4 +23,4 @@ class Account(Base):
     expenses = relationship("Expense", back_populates="account")
 
     def __repr__(self):
-        return f"<Account(name='{self.name}', type='{self.type}', balance='{self.balance}')>"
+        return f"<Account(name='{self.name}', type_account='{self.type_account}', balance='{self.balance}')>"

@@ -2,6 +2,7 @@
     Controlador para excluir uma categoria
 """
 
+from sqlalchemy.exc import SQLAlchemyError
 from db.database import get_db_session, close_db_session
 from db.models import Category, Income, Expense, CreditCardTransaction
 
@@ -43,9 +44,17 @@ def delete_category(category_id):
         session.commit()
 
         return True
-    except Exception as e:
+    except SQLAlchemyError as e:
         session.rollback()
         print(f"Erro ao excluir categoria: {e}")
+        return False
+    except ValueError as e:
+        session.rollback()
+        print(f"Erro de tipo de dados ao excluir categoria: {e}")
+        return False
+    except AttributeError as e:
+        session.rollback()
+        print(f"Erro de atributo ao excluir categoria: {e}")
         return False
     finally:
         close_db_session(session)
@@ -87,9 +96,17 @@ def delete_category_with_reassign(category_id, new_category_id):
         session.commit()
 
         return True
-    except Exception as e:
+    except SQLAlchemyError as e:
         session.rollback()
         print(f"Erro ao excluir categoria e reatribuir transações: {e}")
+        return False
+    except ValueError as e:
+        session.rollback()
+        print(f"Erro de tipo de dados ao excluir categoria e reatribuir transações: {e}")
+        return False
+    except AttributeError as e:
+        session.rollback()
+        print(f"Erro de atributo ao excluir categoria e reatribuir transações: {e}")
         return False
     finally:
         close_db_session(session)

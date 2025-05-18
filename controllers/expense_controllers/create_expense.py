@@ -2,10 +2,10 @@
     Controlador para criar uma nova despesa
 """
 
+import datetime
+from sqlalchemy.exc import SQLAlchemyError
 from db.database import get_db_session, close_db_session
 from db.models import Expense, Account
-import datetime
-
 
 def create_expense(description, amount, date, category_id, account_id, recurrence_id=None):
     """
@@ -28,7 +28,8 @@ def create_expense(description, amount, date, category_id, account_id, recurrenc
     # Converter data de string para objeto date
     try:
         expense_date = datetime.datetime.strptime(date, "%Y-%m-%d").date()
-    except ValueError:
+    except ValueError as e:
+        print(f"Erro de tipo de dados ao converter data: {e}")
         return None
 
     session = get_db_session()
@@ -64,9 +65,17 @@ def create_expense(description, amount, date, category_id, account_id, recurrenc
             'account_id': new_expense.account_id,
             'recurrence_id': new_expense.recurrence_id
         }
-    except Exception as e:
+    except SQLAlchemyError as e:
         session.rollback()
         print(f"Erro ao criar despesa: {e}")
+        return None
+    except ValueError as e:
+        session.rollback()
+        print(f"Erro de tipo de dados ao criar despesa: {e}")
+        return None
+    except AttributeError as e:
+        session.rollback()
+        print(f"Erro de atributo ao criar despesa: {e}")
         return None
     finally:
         close_db_session(session)

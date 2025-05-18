@@ -2,11 +2,12 @@
     Controlador para criar uma nova conta bancária
 """
 
+from sqlalchemy.exc import SQLAlchemyError
 from db.database import get_db_session, close_db_session
 from db.models.account_model import Account
 
 
-def create_account(name, type, balance=0.0):
+def create_account(name, type_account, balance=0.0):
     """
     Cria uma nova conta bancária
 
@@ -24,7 +25,7 @@ def create_account(name, type, balance=0.0):
 
     try:
         # Criar nova conta
-        new_account = Account(name=name, type=type, balance=balance)
+        new_account = Account(name=name, type_account=type_account, balance=balance)
 
         # Adicionar ao banco de dados
         session.add(new_account)
@@ -34,12 +35,20 @@ def create_account(name, type, balance=0.0):
         return {
             'id': new_account.id,
             'name': new_account.name,
-            'type': new_account.type,
+            'type_account': new_account.type_account,
             'balance': new_account.balance
         }
-    except Exception as e:
+    except SQLAlchemyError as e:
         session.rollback()
         print(f"Erro ao criar conta: {e}")
+        return None
+    except ValueError as e:
+        session.rollback()
+        print(f"Erro de tipo de dados ao criar conta: {e}")
+        return None
+    except AttributeError as e:
+        session.rollback()
+        print(f"Erro de atributo ao criar conta: {e}")
         return None
     finally:
         close_db_session(session)

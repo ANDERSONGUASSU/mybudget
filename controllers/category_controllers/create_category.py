@@ -2,6 +2,7 @@
     Controlador para criar uma nova categoria
 """
 
+from sqlalchemy.exc import SQLAlchemyError
 from db.database import get_db_session, close_db_session
 from db.models import Category
 
@@ -43,9 +44,17 @@ def create_category(name, category_type, color="#4CAF50"):
             'type': new_category.type,
             'color': new_category.color
         }
-    except Exception as e:
+    except SQLAlchemyError as e:
         session.rollback()
         print(f"Erro ao criar categoria: {e}")
+        return None
+    except ValueError as e:
+        session.rollback()
+        print(f"Erro de tipo de dados ao criar categoria: {e}")
+        return None
+    except AttributeError as e:
+        session.rollback()
+        print(f"Erro de atributo ao criar categoria: {e}")
         return None
     finally:
         close_db_session(session)
