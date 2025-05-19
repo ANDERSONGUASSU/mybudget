@@ -70,8 +70,8 @@ def init_db():
         if session.query(Account).count() == 0:
             # Adiciona contas padrão
             accounts = [
-                Account(name="Conta Corrente", type="Corrente", balance=0.0),
-                Account(name="Poupança", type="Poupança", balance=0.0),
+                Account(name="Conta Corrente", type_account="Corrente", balance=0.0),
+                Account(name="Poupança", type_account="Poupança", balance=0.0),
             ]
             session.add_all(accounts)
 

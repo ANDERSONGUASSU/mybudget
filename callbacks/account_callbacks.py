@@ -81,7 +81,7 @@ def update_income_account_checklist(accounts_data):
     """
     Atualiza a checklist de contas de receita usando o store
     """
-    options = [{"label": f"{acc['name']} ({acc['type']})", "value": acc['id']} for acc in accounts_data]
+    options = [{"label": f"{acc['name']} ({acc['type_account']})", "value": acc['id']} for acc in accounts_data]
     return options
 
 
@@ -93,7 +93,7 @@ def update_expense_account_checklist(accounts_data):
     """
     Atualiza a checklist de contas de despesa usando o store
     """
-    options = [{"label": f"{acc['name']} ({acc['type']})", "value": acc['id']} for acc in accounts_data]
+    options = [{"label": f"{acc['name']} ({acc['type_account']})", "value": acc['id']} for acc in accounts_data]
     return options
 
 

@@ -22,7 +22,7 @@ def preencher_contas_receita(is_open, accounts_data):
         return []
 
     options = [
-        {"label": f"{acc['name']} ({acc['type']})", "value": acc['id']}
+        {"label": f"{acc['name']} ({acc['type_account']})", "value": acc['id']}
         for acc in accounts_data
     ]
     return options
@@ -44,7 +44,7 @@ def preencher_contas_despesa(is_open, accounts_data):
         return []
 
     options = [
-        {"label": f"{acc['name']} ({acc['type']})", "value": acc['id']}
+        {"label": f"{acc['name']} ({acc['type_account']})", "value": acc['id']}
         for acc in accounts_data
     ]
     return options
