@@ -2,13 +2,13 @@
     Controlador para obter receitas
 """
 
+import datetime
 from db.queries.income_queries import (
     get_income_by_id,
     get_incomes_by_period,
     get_incomes_by_month,
     get_incomes_by_category
 )
-import datetime
 
 
 def get_income(income_id):

@@ -90,6 +90,18 @@ def get_expense_modal():
                     )
                 ], width=6, className="mb-3 p-2"),
                 dbc.Col([
+                    dbc.Label("Frequência"),
+                    dbc.Input(
+                        id="expense_frequency",
+                        type="number",
+                        min=1,
+                        value=1,
+                        placeholder="Nº de repetições"
+                    )
+                ], width=6, className="mb-3 p-2"),
+            ]),
+            dbc.Row([
+                dbc.Col([
                     dbc.Label("Extras"),
                     dbc.Checklist(
                         id="expense_extras",

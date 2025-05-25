@@ -45,7 +45,9 @@ from callbacks.account_select_callbacks import (
     preencher_contas_despesa,
     preencher_cartoes_credit_card,
 )
-
+from callbacks.income_callbacks import (
+    save_income_modal,
+)
 
 
 
@@ -78,5 +80,6 @@ __all__ = [
     "delete_expense_account",
     "preencher_contas_receita",
     "preencher_contas_despesa",
-    "preencher_cartoes_credit_card"
+    "preencher_cartoes_credit_card",
+    "save_income_modal"
 ]

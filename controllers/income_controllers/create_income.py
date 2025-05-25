@@ -1,3 +1,4 @@
+# src/controllers/income_controllers/create_income.py
 """
     Controlador para criar uma nova receita
 """
@@ -26,11 +27,24 @@ def create_income(description, amount, date, category_id, account_id, recurrence
     if not description or not date or amount <= 0:
         return None
 
-    # Converter data de string para objeto date
-    try:
-        income_date = datetime.datetime.strptime(date, "%Y-%m-%d").date()
-    except ValueError as e:
-        print(f"Erro de tipo de dados ao converter data: {e}")
+    # Converter data para objeto date de forma robusta
+    income_date = None
+    if isinstance(date, datetime.date) and not isinstance(date, datetime.datetime):
+        income_date = date
+    elif isinstance(date, datetime.datetime):
+        income_date = date.date()
+    elif isinstance(date, str):
+        try:
+            # Tenta ISO completo
+            income_date = datetime.datetime.fromisoformat(date).date()
+        except ValueError:
+            try:
+                income_date = datetime.datetime.strptime(date, "%Y-%m-%d").date()
+            except ValueError as e:
+                print(f"Erro de tipo de dados ao converter data: {e}")
+                return None
+    else:
+        print(f"Tipo de dado de data não suportado: {type(date)}")
         return None
 
     session = get_db_session()

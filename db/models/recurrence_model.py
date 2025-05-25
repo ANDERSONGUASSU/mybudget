@@ -16,7 +16,6 @@ class Recurrence(Base):
     type = Column(String(50), nullable=False, name="tipo")
     frequency = Column(Integer, nullable=False, name="frequência")
     start_date = Column(Date, nullable=False, name="data_início")
-    end_date = Column(Date, name="data_fim")
     created_at = Column(DateTime, default=text("CURRENT_TIMESTAMP"))
 
     # Relationships

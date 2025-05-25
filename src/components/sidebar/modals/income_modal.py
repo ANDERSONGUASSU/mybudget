@@ -1,3 +1,4 @@
+# src/components/sidebar/modals/income_modal.py
 """
     Componente de modal para adição de receitas.
 """
@@ -42,12 +43,7 @@ def get_income_modal():
                     dbc.Label("Categoria"),
                     dbc.Select(
                         id="income_category",
-                        options=[
-                            {"label": "Salário", "value": "salario"},
-                            {"label": "Investimentos", "value": "investimentos"},
-                            {"label": "Freelance", "value": "freelance"},
-                            {"label": "Outros", "value": "outros"}
-                        ],
+                        options=[],
                         placeholder="Selecione uma categoria"
                     )
                 ], width=4, className="mb-3 p-2"),
@@ -55,13 +51,7 @@ def get_income_modal():
                     dbc.Label("Conta"),
                     dbc.Select(
                         id="income_account",
-                        options=[
-                            {"label": "Conta Corrente", "value": "conta_corrente"},
-                            {"label": "Poupança", "value": "poupanca"},
-                            {"label": "Cartão de Crédito", "value": "cartao_credito"},
-                            {"label": "Dinheiro", "value": "dinheiro"},
-                            {"label": "Investimentos", "value": "investimentos"}
-                        ],
+                        options=[],
                         placeholder="Selecione uma conta"
                     )
                 ], width=4, className="mb-3 p-2")
@@ -87,12 +77,13 @@ def get_income_modal():
                     )
                 ], width=6, className="mb-3 p-2"),
                 dbc.Col([
-                    dbc.Label("Extras"),
-                    dbc.Checklist(
-                        id="income_extras",
-                        options=[],
-                        value=[],
-                        switch=True
+                    dbc.Label("Frequência"),
+                    dbc.Input(
+                        id="income_frequency",
+                        type="number",
+                        min=1,
+                        value=1,
+                        placeholder="Nº de repetições"
                     )
                 ], width=6, className="mb-3 p-2"),
             ]),
@@ -104,7 +95,9 @@ def get_income_modal():
             dbc.Button("Salvar", color="primary", id="save_income_button"),
             dbc.Popover(dbc.PopoverBody("Receita adicionada com sucesso!"),
                         target="save_income_button",
-                        trigger="click"),
+                        trigger="legacy",
+                        placement="bottom",
+                        ),
             dbc.Button("Cancelar", color="secondary", id="cancel_income_button"),
         ]),
     ], id="modal-income",
